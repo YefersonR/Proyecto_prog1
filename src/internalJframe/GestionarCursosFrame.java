@@ -1,0 +1,345 @@
+package internalJframe;
+
+import java.awt.EventQueue;
+import java.awt.Font;
+
+import javax.swing.JButton;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+
+import conexionConBase.ConexionDB;
+
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.Calendar;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+
+public class GestionarCursosFrame extends JInternalFrame {
+	
+	private JPanel panel;
+	private JTextField textCodigoCurso;
+	private JTextField textNombre;
+	private JTextField textSeccion;
+	private JButton btnActualizar;
+	private JButton btnEliminar;
+	private JButton btnInsertar;
+
+	private JTable table;
+	
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					GestionarCursosFrame frame = new GestionarCursosFrame();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public GestionarCursosFrame() {
+		setClosable(true);
+		setTitle("Gestionar Cursos");
+		setBounds(0, 0, 763, 559);
+		getContentPane().setLayout(null);
+		
+		panel = new JPanel();
+		panel.setBounds(0, 0, 747, 529);
+		getContentPane().add(panel);
+		panel.setLayout(null);
+		
+		
+		labels();
+		buttons();
+		textFields();
+		table();
+		mostrarDatos();
+		cargartabla();
+	}
+	
+	private void labels() {
+		
+		JLabel lblCodigoCurso = new JLabel("Codigo");
+		lblCodigoCurso.setBounds(10, 11, 106, 20);
+		lblCodigoCurso.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		panel.add(lblCodigoCurso);
+		
+		JLabel lblNombre = new JLabel("Nombre");
+		lblNombre.setBounds(126, 11, 86, 20);
+		lblNombre.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		panel.add(lblNombre);
+		
+		JLabel lblSeccion = new JLabel("Seccion");
+		lblSeccion.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		lblSeccion.setBounds(317, 11, 86, 20);
+		panel.add(lblSeccion);
+		
+	}
+	
+	private void buttons() {
+
+		btnInsertar = new JButton("Insertar");
+		btnInsertar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String Nombre =textNombre.getText();
+				String Seccion = textSeccion.getText();
+				
+				try {
+					Connection con = ConexionDB.getConnection();
+					
+					PreparedStatement ps = con.prepareStatement("Insert into Curso(Nombre,Seccion) values(?,?) ");
+					
+					ps.setString(1, Nombre);
+					ps.setString(2, Seccion);
+					
+					
+					
+					ps.executeUpdate();
+					JOptionPane.showMessageDialog(null,"Registro insertado");
+					cargartabla();
+					
+					
+				}catch(SQLException e1) 
+				{
+					JOptionPane.showMessageDialog(null,"Registro No insertado");	
+				}
+			}
+		});
+		btnInsertar.setBounds(10, 71, 150, 30);
+		btnInsertar.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		panel.add(btnInsertar);
+		
+		btnActualizar = new JButton("Actualizar");
+		btnActualizar.setEnabled(false);
+		btnActualizar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int id  = Integer.parseInt(textCodigoCurso.getText());
+				String Nombre =textNombre.getText();
+				String Seccion = textSeccion.getText();
+				
+				try {
+					Connection con = ConexionDB.getConnection();
+					PreparedStatement ps = con.prepareStatement("update Curso set Nombre=?,Seccion=? where IDcurso=? ");
+					
+					ps.setString(1, Nombre);
+					ps.setString(2, Seccion);
+					ps.setInt(3, id);
+					
+					ps.executeUpdate();
+					JOptionPane.showMessageDialog(null,"Registro insertado");
+					cargartabla();
+					habilitarbotones();
+				}catch(SQLException e1) 
+				{
+					JOptionPane.showMessageDialog(null,"Registro No insertado");	
+				}
+			}
+		});
+		btnActualizar.setBounds(170, 71, 150, 30);
+		btnActualizar.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		panel.add(btnActualizar);
+		
+		btnEliminar = new JButton("Eliminar");
+		btnEliminar.setEnabled(false);
+		btnEliminar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int id = Integer.parseInt(textCodigoCurso.getText());
+				
+				try {
+					Connection con = ConexionDB.getConnection();
+					PreparedStatement ps = con.prepareStatement("delete from Curso where IDcurso=?");
+					ps.setInt(1, id);
+					ps.executeUpdate();
+					
+					JOptionPane.showMessageDialog(null,"Registro Eliminado");
+					cargartabla();
+					habilitarbotones();
+				}catch(SQLException e1) 
+				{
+					JOptionPane.showMessageDialog(null,"Registro No eliminado");	
+				}
+			}
+		});
+		btnEliminar.setBounds(330, 71, 150, 30);
+		btnEliminar.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		panel.add(btnEliminar);
+		
+		
+	}
+	
+	private void textFields() {
+		
+		textCodigoCurso = new JTextField();
+		textCodigoCurso.setEditable(false);
+		textCodigoCurso.setBounds(10, 33, 105, 20);
+		panel.add(textCodigoCurso);
+		textCodigoCurso.setColumns(10);
+		
+		textNombre = new JTextField();
+		textNombre.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				DefaultTableModel modelo = (DefaultTableModel) table.getModel();
+				modelo.setRowCount(0);
+				PreparedStatement ps;
+				ResultSet rs;
+				ResultSetMetaData rmd;
+				int column;
+				String nombre = textNombre.getText().trim();
+				
+				int [] ancho= {10,50,20,100};
+				for(int i = 0; i<table.getColumnCount();i++) {
+					table.getColumnModel().getColumn(i).setPreferredWidth(ancho[i]);;
+				}
+				try {
+					Connection con = ConexionDB.getConnection();
+					ps = con.prepareStatement("Select * from Curso where Nombre like '%"+nombre+ "%'");
+					rs = ps.executeQuery();
+					rmd = rs.getMetaData();
+					column = rmd.getColumnCount();
+					while(rs.next()){
+						Object[] fila = new Object[column];
+						for(int indice=0; indice<column;indice++) {
+							fila[indice] = rs.getObject(indice+1);
+						}
+						modelo.addRow(fila);
+					}
+					
+				}catch(SQLException e2) {
+					JOptionPane.showMessageDialog(null, e2.toString());
+				}
+			}
+		});
+		textNombre.setBounds(125, 33, 182, 20);
+		textNombre.setColumns(10);
+		panel.add(textNombre);
+		
+		textSeccion = new JTextField();
+		textSeccion.setBounds(317, 33, 169, 20);
+		textSeccion.setColumns(10);
+		panel.add(textSeccion);
+		
+		
+		
+	}
+	
+	private void table() {
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 138, 727, 380);
+		panel.add(scrollPane);
+		
+		table = new JTable();
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				try {
+					int fila = table.getSelectedRow();
+					int id =Integer.parseInt(table.getValueAt(fila, 0).toString());
+					
+					PreparedStatement ps;
+					ResultSet rs;
+					
+					Connection con = ConexionDB.getConnection();
+					ps = con.prepareStatement("Select * from Curso where IDcurso=?");
+					ps.setInt(1, id);
+					rs = ps.executeQuery();
+					while(rs.next()) {
+						textCodigoCurso.setText(rs.getString(String.valueOf("IDcurso")));
+						textNombre.setText(rs.getString("Nombre"));
+						textSeccion.setText(rs.getString("Seccion"));
+						
+						}
+					habilitarbotones();
+
+				}catch(SQLException a) {
+					JOptionPane.showMessageDialog(null, a.toString());
+				}
+			}
+		});
+		scrollPane.setViewportView(table);
+	}
+	private void habilitarbotones(){
+	
+		if(table.getSelectedRow() != -1) {
+			btnActualizar.setEnabled(true);
+			btnEliminar.setEnabled(true);
+			btnInsertar.setEnabled(false);
+		}
+		else {
+			btnActualizar.setEnabled(false);
+			btnEliminar.setEnabled(false);
+			btnInsertar.setEnabled(true);
+			
+		}
+	}
+	
+	private void limpiar() {
+		textCodigoCurso.setText("");
+		textNombre.setText(" ");
+		textSeccion.setText(" ");	
+	}
+	
+	private void cargartabla(){
+		DefaultTableModel modelo = (DefaultTableModel) table.getModel();
+		modelo.setRowCount(0);
+		PreparedStatement ps;
+		ResultSet rs;
+		ResultSetMetaData rmd;
+		int column;
+		
+		int [] ancho= {10,50,20,100};
+		for(int i = 0; i<table.getColumnCount();i++) {
+			table.getColumnModel().getColumn(i).setPreferredWidth(ancho[i]);;
+		}
+		try {
+			Connection con = ConexionDB.getConnection();
+			ps = con.prepareStatement("Select * from Curso");
+			rs = ps.executeQuery();
+			rmd = rs.getMetaData();
+			column = rmd.getColumnCount();
+			while(rs.next()){
+				Object[] fila = new Object[column];
+				for(int indice=0; indice<column;indice++) {
+					fila[indice] = rs.getObject(indice+1);
+				}
+				modelo.addRow(fila);
+			}
+			limpiar();
+		}catch(SQLException e2) {
+			JOptionPane.showMessageDialog(null, e2.toString());
+		}
+
+	}
+	private void mostrarDatos(){	
+		DefaultTableModel modeloTabla = new DefaultTableModel();
+		modeloTabla.addColumn("Codigo");
+		modeloTabla.addColumn("Nombre");
+		modeloTabla.addColumn("Seccion");
+		
+		table.setModel(modeloTabla);
+
+	}
+}
