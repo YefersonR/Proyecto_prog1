@@ -1,10 +1,13 @@
 package internalJframe;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -20,6 +23,7 @@ import java.sql.Statement;
 import java.util.Calendar;
 
 import conexionConBase.ConexionDB;
+import index.Interface;
 
 import javax.swing.JComboBox;
 import javax.swing.JButton;
@@ -35,7 +39,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-public class GestionarEstudiantesFrame extends JInternalFrame {
+public class GestionarEstudiantesFrame extends JInternalFrame implements Interface {
 	
 	private JTextField textMatricula;
 	private JTextField textNombre;
@@ -47,8 +51,9 @@ public class GestionarEstudiantesFrame extends JInternalFrame {
 	private JTable table;
 	private JPanel panel;
 	private JDateChooser fecha;
-	private JComboBox<String> comboSexo;
+	private JComboBox<String> comboSexo,combocurso;
 	private JButton btnInsertar,btnActualizar,btnEliminar;
+	private JLabel lblCurso;
 
 	/**
 	 * Launch the application.
@@ -70,45 +75,31 @@ public class GestionarEstudiantesFrame extends JInternalFrame {
 	 * Create the frame.
 	 */
 	public GestionarEstudiantesFrame() {
-		setClosable(true);
-		setTitle("Gestionar Estudiantes");
-		setBounds(0, 0, 763, 559);
-		getContentPane().setLayout(null);
-		
-		panel = new JPanel();
-		panel.setBounds(0, 0, 747, 529);
-		getContentPane().add(panel);
-		panel.setLayout(null);
+		setBackground(new Color(255, 255, 255));
+        setBorder(new MatteBorder(5, 5, 5, 5, (Color) new Color(204, 164, 237)));
+        setClosable(true);
+        setTitle("Gestionar Estudiantes");
+        setBounds(0, 0, 763, 559);
+        getContentPane().setLayout(null);
+        
+        panel = new JPanel();
+        panel.setBackground(new Color(255, 255, 255));
+        panel.setBounds(0, 0, 754, 529);
+        getContentPane().add(panel);
+        panel.setLayout(null);
 		
 		fecha = new JDateChooser();
-		fecha.setBounds(347, 85, 169, 20);
-		panel.add(fecha);
+		fecha.setBounds(10, 85, 182, 20);
+    	panel.add(fecha);
 		
 	
 		comboSexo = new JComboBox<String>();
-		comboSexo.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			try {
-					Connection con = ConexionDB.getConnection();
-					PreparedStatement ps = con.prepareStatement("Select Sexo from Sexo order by id");
-					ResultSet rs = ps.executeQuery();
-
-					while(rs.next()) {
-						comboSexo.addItem(rs.getString("Sexo"));
-						}
-						
-				}catch(SQLException e1) 
-					{
-						JOptionPane.showMessageDialog(null,"Registro No Sexo");	
-					}
-				}
-			});
-			comboSexo.setBounds(345, 84, 47, 22);
-			panel.add(comboSexo);
 		comboSexo.setBounds(496, 32, 47, 22);
 		panel.add(comboSexo);
 		
 		comboSexo.addItem(" ");
+		comboSexo.addItem("M");
+		comboSexo.addItem("F");
 
 		Labels();
 		textFields();
@@ -120,7 +111,7 @@ public class GestionarEstudiantesFrame extends JInternalFrame {
 		
 
 	}
-	private void table() {
+	public void table() {
 		JScrollPane scrollPane = new JScrollPane();
 
 		scrollPane.setBounds(10, 138, 727, 380);
@@ -138,18 +129,18 @@ public class GestionarEstudiantesFrame extends JInternalFrame {
 					ResultSet rs;
 					
 					Connection con = ConexionDB.getConnection();
-					ps = con.prepareStatement("Select * from Alumno where Matricula=?");
+					ps = con.prepareStatement("Select * from Alumnos where Matricula=?");
 					ps.setInt(1, id);
 					rs = ps.executeQuery();
 					while(rs.next()) {
-						textMatricula.setText(String.valueOf("Matricula"));
-						textNombre.setText(rs.getString("Nombre "));
+						textMatricula.setText(rs.getString(String.valueOf("Matricula")));
+						textNombre.setText(rs.getString("Nombre"));
 						comboSexo.getModel().setSelectedItem((rs.getString("Sexo")));
-						fecha.setToolTipText(rs.getString("Fecha_Nacimiento "));
-						textTelefono.setText(rs.getString("Telefono  "));
-						textEmail.setText(rs.getString("Email  "));
-						textDireccion.setText(rs.getString("Direccion  "));
-						
+						fecha.setToolTipText(rs.getString("Fecha_Nacimiento"));
+						textTelefono.setText(rs.getString("Telefono"));
+						textEmail.setText(rs.getString("Email"));
+						textDireccion.setText(rs.getString("Direccion"));
+						combocurso.getModel().setSelectedItem((rs.getString("IDcurso")));
 						}
 					habilitarbotones();
 					
@@ -160,10 +151,42 @@ public class GestionarEstudiantesFrame extends JInternalFrame {
 			}
 		});
 		scrollPane.setViewportView(table);
+		
+		lblCurso = new JLabel("Curso");
+		lblCurso.setFont(new Font("SansSerif", Font.PLAIN, 15));
+		lblCurso.setBounds(447, 85, 47, 20);
+		panel.add(lblCurso);
+		
+		combocurso = new JComboBox<String>();
+		combocurso.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					Connection con = ConexionDB.getConnection();
+					PreparedStatement ps = con.prepareStatement("Select IDcurso as Curso from Curso");
+					ResultSet rs = ps.executeQuery();
+
+					while(rs.next()) {
+						combocurso.addItem(rs.getString("Curso"));
+						}
+
+					
+				}catch(SQLException e1) 
+				{
+					JOptionPane.showMessageDialog(null,"Registro No encontrado");	
+				}
+			}
+		});
+		combocurso.setBounds(496, 85, 47, 22);
+		panel.add(combocurso);
+		combocurso.addItem(" ");
 	}
-	private void buttons() {
+	public void buttons() {
 		
 		btnInsertar = new JButton("Insertar");
+		btnInsertar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		btnInsertar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -176,25 +199,19 @@ public class GestionarEstudiantesFrame extends JInternalFrame {
 				String Telefono = textTelefono.getText();
 				String Email =textEmail.getText();
 				String Direccion = textDireccion.getText();
-				int sexo;
-				if(Sexo=="F") {
-					 sexo= 1;
-				}
-				else {
-					sexo=2;
-				}
+				int idcurso = Integer.parseInt(combocurso.getSelectedItem().toString());
+				
 				try {
 					Connection con = ConexionDB.getConnection();
-					PreparedStatement ps = con.prepareStatement("Insert into Alumnos(Nombre,idsexo,Fecha_Nacimiento,Telefono,Email,Direccion) values(?,?,?,?,?,?) ");
+					PreparedStatement ps = con.prepareStatement("Insert into Alumnos(Nombre,Sexo,Fecha_Nacimiento,Telefono,Email,Direccion,IDcurso) values(?,?,?,?,?,?,?)");
 					
 					ps.setString(1, Nombre);
-					ps.setInt(2, sexo);
+					ps.setString(2, Sexo);
 					ps.setString(3, Fecha_Nacimiento);
 					ps.setString(4, Telefono);
 					ps.setString(5, Email);
 					ps.setString(6, Direccion);
-					
-					
+					ps.setInt(7, idcurso);
 					
 					ps.executeUpdate();
 					JOptionPane.showMessageDialog(null,"Registro insertado");
@@ -208,9 +225,11 @@ public class GestionarEstudiantesFrame extends JInternalFrame {
 
 			}
 		});
-		btnInsertar.setBounds(553, 25, 184, 30);
-		btnInsertar.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		panel.add(btnInsertar);
+
+        btnInsertar.setBounds(563, 24, 184, 30);
+        btnInsertar.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        panel.add(btnInsertar);
+
 		
 		btnActualizar = new JButton("Actualizar");
 		btnActualizar.setEnabled(false);
@@ -219,24 +238,21 @@ public class GestionarEstudiantesFrame extends JInternalFrame {
 				int Matricula  = Integer.parseInt(textMatricula.getText());
 				String Nombre =textNombre.getText();
 				String Sexo = comboSexo.getSelectedItem().toString();
-				int anio =fecha.getCalendar().get(Calendar.YEAR);
-				int mes =fecha.getCalendar().get(Calendar.MARCH);
-				int dia =fecha.getCalendar().get(Calendar.DAY_OF_MONTH);
-				String Fecha_Nacimiento =(anio+"-"+mes+"-"+dia);
 				String Telefono = textTelefono.getText();
 				String Email =textEmail.getText();
 				String Direccion = textDireccion.getText();
-				 
+				int idcurso = Integer.parseInt(combocurso.getSelectedItem().toString());
+								 
 				try {
 					Connection con = ConexionDB.getConnection();
-					PreparedStatement ps = con.prepareStatement("update Alumno set Nombre=?,Sexo=?,Fecha_Nacimiento=?,Telefono=? Email=?,Direccion=? where Matricula=? ");
+					PreparedStatement ps = con.prepareStatement("update Alumnos set Nombre=?,Sexo=?,Telefono=?,Email=?,Direccion=?, IDcurso=? where Matricula=? ");
 					
 					ps.setString(1, Nombre);
 					ps.setString(2, Sexo);
-					ps.setString(3, Fecha_Nacimiento);
-					ps.setString(4, Telefono);
-					ps.setString(5, Email);
-					ps.setString(6, Direccion);
+					ps.setString(3, Telefono);
+					ps.setString(4, Email);
+					ps.setString(5, Direccion);
+					ps.setInt(6, idcurso);
 					ps.setInt(7, Matricula);
 					
 					
@@ -257,9 +273,9 @@ public class GestionarEstudiantesFrame extends JInternalFrame {
 			}
 		});
 
-		btnActualizar.setBounds(553, 60, 184, 30);
-		btnActualizar.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		panel.add(btnActualizar);
+	     btnActualizar.setBounds(563, 60, 184, 30);
+	     btnActualizar.setFont(new Font("Tahoma", Font.PLAIN, 14));
+	     panel.add(btnActualizar);
 		
 		btnEliminar = new JButton("Eliminar");
 		btnEliminar.setEnabled(false);
@@ -287,19 +303,21 @@ public class GestionarEstudiantesFrame extends JInternalFrame {
 			}
 
 		});
-		btnEliminar.setBounds(553, 95, 184, 32);
-		btnEliminar.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		panel.add(btnEliminar);
+
+        btnEliminar.setBounds(563, 95, 184, 32);
+        btnEliminar.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        panel.add(btnEliminar);
 		
 	}
-	private void textFields() {
+	public void textFields() {
 		
 		textMatricula = new JTextField();
 		textMatricula.setEditable(false);
-		textMatricula.setBounds(10, 33, 105, 20);
+		textMatricula.setBounds(201, 33, 79, 20);
 		panel.add(textMatricula);
 		textMatricula.setColumns(10);
-		
+		textMatricula.setHorizontalAlignment(SwingConstants.CENTER);
+	        
 		textNombre = new JTextField();
 		textNombre.addKeyListener(new KeyAdapter() {
 			@Override
@@ -312,13 +330,9 @@ public class GestionarEstudiantesFrame extends JInternalFrame {
 				int column;
 				String nombre = textNombre.getText().trim();
 				
-				int [] ancho= {10,50,20,100};
-				for(int i = 0; i<table.getColumnCount();i++) {
-					table.getColumnModel().getColumn(i).setPreferredWidth(ancho[i]);;
-				}
 				try {
 					Connection con = ConexionDB.getConnection();
-					ps = con.prepareStatement("Select * from Curso where Nombre like '%"+nombre+ "%'");
+					ps = con.prepareStatement("Select * from Alumnos where Nombre like '%"+nombre+ "%'");
 					rs = ps.executeQuery();
 					rmd = rs.getMetaData();
 					column = rmd.getColumnCount();
@@ -335,66 +349,69 @@ public class GestionarEstudiantesFrame extends JInternalFrame {
 				}
 			}
 		});
-		textNombre.setBounds(125, 33, 182, 20);
-		textNombre.setColumns(10);
-		panel.add(textNombre);
+		 textNombre.setHorizontalAlignment(SwingConstants.CENTER);
+		textNombre.setBounds(10, 33, 182, 20);
+        textNombre.setColumns(10);
+        panel.add(textNombre);
 		
-		textTelefono = new JTextField();
-		textTelefono.setBounds(10, 85, 135, 20);
-		textTelefono.setColumns(10);
-		panel.add(textTelefono);
-		
-		textDireccion = new JTextField();
-		textDireccion.setBounds(155, 85, 182, 20);
-		textDireccion.setColumns(10);
-		panel.add(textDireccion);
-		
-		textEmail = new JTextField();
-		textEmail.setBounds(317, 33, 169, 20);
-		textEmail.setColumns(10);
-		panel.add(textEmail);
-		
-	}
-	private void Labels() {
-		
-		JLabel lblNewLabel = new JLabel("Matricula");
-		lblNewLabel.setBounds(10, 11, 86, 20);
-		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		panel.add(lblNewLabel);
-		
-		JLabel lblNombre = new JLabel("Nombre");
-		lblNombre.setBounds(125, 11, 86, 20);
-		lblNombre.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		panel.add(lblNombre);
-		
-		JLabel lblFecha = new JLabel("Fecha de nacimiento");
-		lblFecha.setBounds(347, 65, 169, 20);
-		lblFecha.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		panel.add(lblFecha);
-		
-		JLabel lblSexo = new JLabel("Sexo");
-		lblSexo.setBounds(496, 11, 47, 20);
-		lblSexo.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		panel.add(lblSexo);
-		
-		JLabel lbltelefono = new JLabel("Telefono ");
-		lbltelefono.setBounds(10, 65, 86, 20);
-		lbltelefono.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		panel.add(lbltelefono);
-		
-		lblDireccion = new JLabel("Direccion ");
-		lblDireccion.setBounds(155, 65, 86, 20);
-		lblDireccion.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		panel.add(lblDireccion);
-		
-		lblEmail = new JLabel("E-mail");
-		lblEmail.setBounds(317, 11, 86, 20);
-		lblEmail.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		panel.add(lblEmail);
-		
+        textTelefono = new JTextField();
+        textTelefono.setHorizontalAlignment(SwingConstants.CENTER);
+        textTelefono.setBounds(202, 85, 78, 20);
+        textTelefono.setColumns(10);
+        panel.add(textTelefono);
+        
+        textDireccion = new JTextField();
+        textDireccion.setHorizontalAlignment(SwingConstants.CENTER);
+        textDireccion.setBounds(290, 32, 149, 20);
+        textDireccion.setColumns(10);
+        panel.add(textDireccion);
+
+        textEmail = new JTextField();
+        textEmail.setHorizontalAlignment(SwingConstants.CENTER);
+        textEmail.setBounds(290, 85, 149, 20);
+        textEmail.setColumns(10);
+        panel.add(textEmail);
 		
 	}
-	private void habilitarbotones(){
+	public void Labels() {
+		JLabel lblNewLabel = new JLabel("Matr\u00EDcula");
+        lblNewLabel.setBounds(210, 11, 60, 20);
+        lblNewLabel.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        panel.add(lblNewLabel);
+
+        JLabel lblNombre = new JLabel("Nombre");
+        lblNombre.setBounds(71, 11, 60, 20);
+        lblNombre.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        panel.add(lblNombre);
+
+        JLabel lblFecha = new JLabel("Fecha de nacimiento");
+        lblFecha.setBounds(32, 65, 142, 20);
+        lblFecha.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        panel.add(lblFecha);
+
+        JLabel lblSexo = new JLabel("Sexo");
+        lblSexo.setBounds(447, 31, 39, 20);
+        lblSexo.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        panel.add(lblSexo);
+
+        JLabel lbltelefono = new JLabel("Tel\u00E9fono ");
+        lbltelefono.setBounds(210, 65, 60, 20);
+        lbltelefono.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        panel.add(lbltelefono);
+
+        lblDireccion = new JLabel("Direcci\u00F3n ");
+        lblDireccion.setBounds(331, 10, 67, 20);
+        lblDireccion.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        panel.add(lblDireccion);
+
+        lblEmail = new JLabel("E-mail");
+        lblEmail.setBounds(341, 63, 47, 20);
+        lblEmail.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        panel.add(lblEmail);
+		
+		
+	}
+	public void habilitarbotones(){
 		
 		if(table.getSelectedRow() != -1) {
 			btnActualizar.setEnabled(true);
@@ -409,29 +426,25 @@ public class GestionarEstudiantesFrame extends JInternalFrame {
 		}
 	}
 	
-	private void limpiar() {
+	public void limpiar() {
 		textMatricula.setText("");
 		textNombre.setText("");
 		comboSexo.getModel().setSelectedItem(" ");
 		fecha.setToolTipText("");
 		textTelefono.setText("");
 		textEmail.setText("");
-		textDireccion.setText("");				
+		textDireccion.setText("");		
+		combocurso.getModel().setSelectedItem(" ");
 }
 
-	private void cargartabla(){
+	public void cargartabla(){
 		DefaultTableModel modelo = (DefaultTableModel) table.getModel();
 		modelo.setRowCount(0);
 		PreparedStatement ps;
 		ResultSet rs;
 		ResultSetMetaData rmd;
 		int column;
-	/*	
-		int [] ancho= {10,50,20,100};
-		for(int i = 0; i<table.getColumnCount();i++) {
-			table.getColumnModel().getColumn(i).setPreferredWidth(ancho[i]);;
-		}
-		*/
+	
 		try {
 			Connection con = ConexionDB.getConnection();
 			ps = con.prepareStatement("Select * from Alumnos");
@@ -450,38 +463,25 @@ public class GestionarEstudiantesFrame extends JInternalFrame {
 			JOptionPane.showMessageDialog(null, e2.toString());
 		}
 	}
-	private void mostrarDatos(){
-		//BasedeDatos = Conexion.getConnection();
+	public void mostrarDatos(){
 		
 		DefaultTableModel modeloTabla = new DefaultTableModel();
 		modeloTabla.addColumn("Matricula");
 		modeloTabla.addColumn("Nombre");
 		modeloTabla.addColumn("Sexo");
-		modeloTabla.addColumn("E-mail");
-		modeloTabla.addColumn("Telefono");
-		modeloTabla.addColumn("Fecha de nacimiento");
+		modeloTabla.addColumn("Fecha_Nacimiento");
 		modeloTabla.addColumn("Direccion");
-		
+		modeloTabla.addColumn("Email");
+		modeloTabla.addColumn("Telefono");
+		modeloTabla.addColumn("IDcurso");
 		
 		table.setModel(modeloTabla);
 		
-		//String Datos[] = new String[3];
+	}
+
+	@Override
+	public void labels() {
+		// TODO Auto-generated method stub
 		
-		//try {
-			//Statement leer = //BasedeDatos.createStatement();
-			//ResultSet resultado = leer.executeQuery("SELECT * FROM Eventos_Agenda");
-			
-			//while (resultado.next()) {
-					//Datos[0] = String.valueOf(resultado.getString(1));
-					//Datos[1] = resultado.getString(2);
-					//Datos[2] = resultado.getString(3);
-					//modeloTabla.addRow(Datos);
-			//}
-			//table.setModel(modeloTabla);
-			
-			
-		//}//catch (Exception e) {
-			//JOptionPane.showMessageDialog(null, e.toString());	
-		//}
 	}
 }

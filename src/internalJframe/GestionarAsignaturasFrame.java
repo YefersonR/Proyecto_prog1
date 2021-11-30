@@ -12,9 +12,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableModel;
 
 import conexionConBase.ConexionDB;
+import index.Interface;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -27,18 +30,19 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.Color;
 
-public class GestionarAsignaturasFrame extends JInternalFrame {
+public class GestionarAsignaturasFrame extends JInternalFrame implements Interface{
 	
 	private JPanel panel;
 	private JTextField textCodigoMateria;
 	private JTextField textNombre;
-	private JTextField textProfesor;
 	private JButton btnInsertar,btnActualizar,btnEliminar;
 	
 	private JComboBox<String> comboCurso;
 	
 	private JTable table;
+	private JComboBox<String> comboprofe;
 	
 	/**
 	 * Launch the application.
@@ -60,12 +64,15 @@ public class GestionarAsignaturasFrame extends JInternalFrame {
 	 * Create the frame.
 	 */
 	public GestionarAsignaturasFrame() {
-		setClosable(true);
-		setTitle("Gestionar Asignaturas");
-		setBounds(0, 0, 763, 559);
-		getContentPane().setLayout(null);
+		setBackground(new Color(255, 255, 255));
+        setBorder(new MatteBorder(5, 5, 5, 5, (Color) new Color(204, 164, 237)));
+        setClosable(true);
+        setTitle("Gestionar Asignaturas");
+        setBounds(0, 0, 763, 559);
+        getContentPane().setLayout(null);
 		
 		panel = new JPanel();
+		panel.setBackground(Color.WHITE);
 		panel.setBounds(0, 0, 747, 529);
 		getContentPane().add(panel);
 		panel.setLayout(null);
@@ -76,23 +83,23 @@ public class GestionarAsignaturasFrame extends JInternalFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					Connection con = ConexionDB.getConnection();
-					PreparedStatement ps = con.prepareStatement("Select Nombre from Curso");
+					PreparedStatement ps = con.prepareStatement("Select IDcurso as Curso from Curso");
 					ResultSet rs = ps.executeQuery();
 
 					while(rs.next()) {
-						comboCurso.addItem(rs.getString("Nombre"));
+						comboCurso.addItem(rs.getString("Curso"));
 						}
 
 					
 				}catch(SQLException e1) 
 				{
-					JOptionPane.showMessageDialog(null,"Registro No");	
+					JOptionPane.showMessageDialog(null,"Registro No encontrado");	
 				}
 			}
 		});
 		comboCurso.addMouseListener(new MouseAdapter() {
 		});
-		comboCurso.setBounds(496, 32, 59, 22);
+		comboCurso.setBounds(446, 32, 59, 22);
 		panel.add(comboCurso);
 			
 		comboCurso.addItem(" ");
@@ -104,9 +111,10 @@ public class GestionarAsignaturasFrame extends JInternalFrame {
 		table();
 		buttons();
 		mostrarDatos();
+		cargartabla();
 	}
 	
-	private void table() {
+	public void table() {
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(10, 138, 727, 380);
@@ -128,10 +136,10 @@ public class GestionarAsignaturasFrame extends JInternalFrame {
 					ps.setInt(1, id);
 					rs = ps.executeQuery();
 					while(rs.next()) {
-						textCodigoMateria.setText(String.valueOf("IDcalificacion"));
+						textCodigoMateria.setText(rs.getString(String.valueOf("IDasignatura")));
 						textNombre.setText(rs.getString("Nombre"));
-						textProfesor.setText(rs.getString("Profesor"));
-						comboCurso.getModel().setSelectedItem((rs.getString("Curso")));
+						comboCurso.getModel().setSelectedItem((rs.getString(String.valueOf("IDcurso"))));
+						comboprofe.getModel().setSelectedItem(rs.getString(String.valueOf("IDprofesor")));
 						
 						}
 					habilitarbotones();
@@ -145,47 +153,47 @@ public class GestionarAsignaturasFrame extends JInternalFrame {
 	}
 	
 	
-	private void labels() {
+	public void labels() {
 		
 		JLabel lblCodigoMateria = new JLabel("Codigo");
-		lblCodigoMateria.setBounds(10, 11, 106, 20);
-		lblCodigoMateria.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		panel.add(lblCodigoMateria);
-		
-		JLabel lblNombre = new JLabel("Nombre");
-		lblNombre.setBounds(126, 11, 86, 20);
-		lblNombre.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		panel.add(lblNombre);
-		
-		JLabel lblProfesor = new JLabel("Profesor");
-		lblProfesor.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lblProfesor.setBounds(317, 11, 86, 20);
-		panel.add(lblProfesor);
-		
-		JLabel lblCursos = new JLabel("Cursos");
-		lblCursos.setBounds(496, 11, 59, 20);
-		lblCursos.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		panel.add(lblCursos);
+		lblCodigoMateria.setBounds(217, 11, 46, 20);
+		lblCodigoMateria.setFont(new Font("SansSerif", Font.PLAIN, 15));
+	    panel.add(lblCodigoMateria);
+
+	    JLabel lblNombre = new JLabel("Nombre");
+        lblNombre.setBounds(71, 11, 60, 20);
+        lblNombre.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        panel.add(lblNombre);
+
+        JLabel lblProfesor = new JLabel("Profesor");
+        lblProfesor.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        lblProfesor.setBounds(340, 11, 69, 20);
+        panel.add(lblProfesor);
+
+        JLabel lblCursos = new JLabel("Cursos");
+        lblCursos.setBounds(446, 11, 59, 20);
+        lblCursos.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        panel.add(lblCursos);
 		
 	}
 
-	private void buttons() {
+	public void buttons() {
 		
 		btnInsertar = new JButton("Insertar");
 		btnInsertar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				String Nombre =textNombre.getText();
-				String Profesor =textProfesor.getText();
-				String Cursos = comboCurso.getSelectedItem().toString();
+				int Profesor = Integer.parseInt(comboprofe.getSelectedItem().toString());
+				int Cursos = Integer.parseInt(comboCurso.getSelectedItem().toString());
 				
 				try {
 					Connection con = ConexionDB.getConnection();
-					PreparedStatement ps = con.prepareStatement("Insert into Asignaturas(Nombre,IDcursos,IDprofesor) values(?,?,?) ");
+					PreparedStatement ps = con.prepareStatement("Insert into Asignaturas(Nombre,IDcurso,IDprofesor) values(?,?,?) ");
 					
 					ps.setString(1, Nombre);
-					ps.setString(2, Profesor);
-					ps.setString(3, Cursos);					
+					ps.setInt(2, Cursos);					
+					ps.setInt(3, Profesor);
 					
 					
 					ps.executeUpdate();
@@ -209,25 +217,24 @@ public class GestionarAsignaturasFrame extends JInternalFrame {
 			public void mouseClicked(MouseEvent e) {
 				int id  = Integer.parseInt(textCodigoMateria.getText());
 				String Nombre =textNombre.getText();
-				String Profesor =textProfesor.getText();
-				String Cursos = comboCurso.getSelectedItem().toString();
-				
+				int Cursos = Integer.parseInt(comboCurso.getSelectedItem().toString());
+				int Profesor = Integer.parseInt(comboprofe.getSelectedItem().toString());
 				try {
 					Connection con = ConexionDB.getConnection();
-					PreparedStatement ps = con.prepareStatement("update Asignaturas set Nombre=?,IDcursos=?,IDprofesor=? where IDasignatura=?");
+					PreparedStatement ps = con.prepareStatement("update Asignaturas set Nombre=?,IDcurso=?,IDprofesor=? where IDasignatura=?");
 					
 					ps.setString(1, Nombre);
-					ps.setString(2, Profesor);
-					ps.setString(3, Cursos);					
-					ps.setInt(3, id);	
+					ps.setInt(2, Cursos);					
+					ps.setInt(3, Profesor);
+					ps.setInt(4, id);	
 					
 					ps.executeUpdate();
-					JOptionPane.showMessageDialog(null,"Registro insertado");
+					JOptionPane.showMessageDialog(null,"Registro Actualizado");
 					cargartabla();
 					habilitarbotones();
 				}catch(SQLException e1) 
 				{
-					JOptionPane.showMessageDialog(null,"Registro No insertado");	
+					JOptionPane.showMessageDialog(null,"Registro No Actualizado");	
 				}
 			}
 		});
@@ -262,15 +269,40 @@ public class GestionarAsignaturasFrame extends JInternalFrame {
 		btnEliminar.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		panel.add(btnEliminar);
 		
+		comboprofe = new JComboBox<String>();
+		comboprofe.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					Connection con = ConexionDB.getConnection();
+					PreparedStatement ps = con.prepareStatement("Select Codigo from Profesores");
+					ResultSet rs = ps.executeQuery();
+
+					while(rs.next()) {
+						comboprofe.addItem(rs.getString("Codigo"));
+						}
+
+					
+				}catch(SQLException e1) 
+				{
+					JOptionPane.showMessageDialog(null,"Registro No encontrado");	
+				}	
+			
+			}
+		});
+		comboprofe.setBounds(334, 32, 59, 22);
+		panel.add(comboprofe);
+		
+		comboprofe.addItem(" ");
 	}
 	
-	private void textFields() {
+	public void textFields() {
 		
 		textCodigoMateria = new JTextField();
 		textCodigoMateria.setEditable(false);
-		textCodigoMateria.setBounds(10, 33, 105, 20);
-		panel.add(textCodigoMateria);
-		textCodigoMateria.setColumns(10);
+		textCodigoMateria.setHorizontalAlignment(SwingConstants.CENTER);
+        textCodigoMateria.setBounds(201, 33, 79, 20);
+        panel.add(textCodigoMateria);
+        textCodigoMateria.setColumns(10);
 		
 		textNombre = new JTextField();
 		textNombre.addKeyListener(new KeyAdapter() {
@@ -284,10 +316,6 @@ public class GestionarAsignaturasFrame extends JInternalFrame {
 				int column;
 				String nombre = textNombre.getText().trim();
 				
-				int [] ancho= {10,50,20,100};
-				for(int i = 0; i<table.getColumnCount();i++) {
-					table.getColumnModel().getColumn(i).setPreferredWidth(ancho[i]);;
-				}
 				try {
 					Connection con = ConexionDB.getConnection();
 					ps = con.prepareStatement("Select * from Asignaturas where Nombre like '%"+nombre+ "%'");
@@ -307,17 +335,13 @@ public class GestionarAsignaturasFrame extends JInternalFrame {
 				}
 			}
 		});
-		textNombre.setBounds(125, 33, 182, 20);
-		textNombre.setColumns(10);
-		panel.add(textNombre);
-		
-		textProfesor = new JTextField();
-		textProfesor.setBounds(317, 33, 169, 20);
-		textProfesor.setColumns(10);
-		panel.add(textProfesor);
+        textNombre.setHorizontalAlignment(SwingConstants.CENTER);
+        textNombre.setBounds(10, 33, 182, 20);
+        textNombre.setColumns(10);
+        panel.add(textNombre);
 		
 	}
-	private void habilitarbotones(){
+	public void habilitarbotones(){
 		
 		if(table.getSelectedRow() != -1) {
 			btnActualizar.setEnabled(true);
@@ -331,8 +355,15 @@ public class GestionarAsignaturasFrame extends JInternalFrame {
 			
 		}
 	}
+	public void limpiar() {		
+		textCodigoMateria.setText("");
+		textNombre.setText("");
+		comboCurso.getModel().setSelectedItem("");
+		comboprofe.getModel().setSelectedItem("");
+		
+}
 	
-	private void cargartabla(){
+	public void cargartabla(){
 		DefaultTableModel modelo = (DefaultTableModel) table.getModel();
 		modelo.setRowCount(0);
 		PreparedStatement ps;
@@ -340,10 +371,6 @@ public class GestionarAsignaturasFrame extends JInternalFrame {
 		ResultSetMetaData rmd;
 		int column;
 		
-		int [] ancho= {10,50,20,100};
-		for(int i = 0; i<table.getColumnCount();i++) {
-			table.getColumnModel().getColumn(i).setPreferredWidth(ancho[i]);;
-		}
 		try {
 			Connection con = ConexionDB.getConnection();
 			ps = con.prepareStatement("Select * from Asignaturas");
@@ -357,18 +384,18 @@ public class GestionarAsignaturasFrame extends JInternalFrame {
 				}
 				modelo.addRow(fila);
 			}
-			
+			limpiar();
 		}catch(SQLException e2) {
 			JOptionPane.showMessageDialog(null, e2.toString());
 		}
 	}
-	private void mostrarDatos(){
+	public void mostrarDatos(){
 		
 		DefaultTableModel modeloTabla = new DefaultTableModel();
-		modeloTabla.addColumn("Codigo");
+		modeloTabla.addColumn("IDasignatura");
 		modeloTabla.addColumn("Nombre");
-		modeloTabla.addColumn("Profesor");
-		modeloTabla.addColumn("Curso");
+		modeloTabla.addColumn("IDcurso");
+		modeloTabla.addColumn("IDprofesor");
 		
 		
 		table.setModel(modeloTabla);

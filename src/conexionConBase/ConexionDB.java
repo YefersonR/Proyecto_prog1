@@ -19,7 +19,7 @@ public class ConexionDB {
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 			cn = DriverManager.getConnection(connectionUrl);
 			
-			//JOptionPane.showMessageDialog(exception, "Conexion Saticfactora");
+			
 		} 
 		catch (Exception ex){
 			

@@ -1,5 +1,6 @@
 package internalJframe;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 
@@ -10,9 +11,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableModel;
 
 import conexionConBase.ConexionDB;
+import index.Interface;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -30,7 +34,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-public class GestionarProfesoresFrame extends JInternalFrame {
+public class GestionarProfesoresFrame extends JInternalFrame implements Interface{
 	
 	private JPanel panel;
 	private JTextField textCodigo;
@@ -62,50 +66,38 @@ public class GestionarProfesoresFrame extends JInternalFrame {
 	 * Create the frame.
 	 */
 	public GestionarProfesoresFrame() {
-		setClosable(true);
-		setTitle("Gestionar Profesores");
-		setBounds(0, 0, 763, 559);
-		getContentPane().setLayout(null);
-		
+			
+		setBackground(new Color(255, 255, 255));
+        setBorder(new MatteBorder(5, 5, 5, 5, (Color) new Color(204, 164, 237)));
+        setClosable(true);
+        setTitle("Gestionar Profesores");
+        setBounds(0, 0, 763, 559);
+        getContentPane().setLayout(null);
+        
 		panel = new JPanel();
+		panel.setBackground(Color.WHITE);
 		panel.setBounds(0, 0, 747, 529);
 		getContentPane().add(panel);
 		panel.setLayout(null);
 		
 			comboSexo = new JComboBox<String>();
-			comboSexo.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					try {
-						Connection con = ConexionDB.getConnection();
-						PreparedStatement ps = con.prepareStatement("Select Sexo from Sexo order by id");
-						ResultSet rs = ps.executeQuery();
-
-						while(rs.next()) {
-							comboSexo.addItem(rs.getString("Sexo"));
-							}
-
-						
-					}catch(SQLException e1) 
-					{
-						JOptionPane.showMessageDialog(null,"Registro No actualizado");	
-					}
-				}
-			});
 			comboSexo.setBounds(345, 84, 47, 22);
 			panel.add(comboSexo);
 
-		
+
+			comboSexo.addItem("M");
+			comboSexo.addItem("F");
 		
 		
 		labels();
 		buttons();
 		textFields();
-		table();
+		//table();
 		mostrarDatos();
 		cargartabla();
 	}
 	
-	private void table() {
+	public void table() {
 		
 		JScrollPane scrollPane = new JScrollPane();
 
@@ -128,12 +120,12 @@ public class GestionarProfesoresFrame extends JInternalFrame {
 					ps.setInt(1, id);
 					rs = ps.executeQuery();
 					while(rs.next()) {
-						textCodigo.setText(String.valueOf("Codigo"));
-						textNombre.setText(rs.getString("Nombre "));
-						comboSexo.getModel().setSelectedItem((rs.getString("Sexo")));
+						textCodigo.setText(rs.getString(String.valueOf("Codigo")));
+						textNombre.setText(rs.getString("Nombre"));
+						comboSexo.getModel().setSelectedItem((rs.getString(String.valueOf("Sexo"))));
 						textTelefono.setText(rs.getString("Telefono"));
-						textEmail.setText(rs.getString("Email"));
 						textDireccion.setText(rs.getString("Direccion"));
+						textEmail.setText(rs.getString("Email"));
 						
 						}
 					habilitarbotones();
@@ -147,8 +139,7 @@ public class GestionarProfesoresFrame extends JInternalFrame {
 		scrollPane.setViewportView(table);
 	}
 	
-	
-	private void buttons() {
+	public void buttons() {
 		
 		btnInsertar = new JButton("Insertar");
 		btnInsertar.addMouseListener(new MouseAdapter() {
@@ -159,24 +150,16 @@ public class GestionarProfesoresFrame extends JInternalFrame {
 				String Telefono = textTelefono.getText();
 				String Email =textEmail.getText();
 				String Direccion = textDireccion.getText();
-				int sexo;
-				if(Sexo=="F") {
-					 sexo= 1;
-				}
-				else {
-					sexo=2;
-				}
+				
 				try {
 					Connection con = ConexionDB.getConnection();
-					PreparedStatement ps = con.prepareStatement("Insert into Profesores(Nombre,idsexo,Telefono,Email,Direccion) values(?,?,?,?,?) ");
+					PreparedStatement ps = con.prepareStatement("Insert into Profesores(Nombre,Sexo,Telefono,Email,Direccion) values(?,?,?,?,?) ");
 					
 					ps.setString(1, Nombre);
-					ps.setInt(2, sexo);
+					ps.setString(2, Sexo);
 					ps.setString(3, Telefono);
 					ps.setString(4, Email);
 					ps.setString(5, Direccion);
-					
-					
 					
 					ps.executeUpdate();
 					JOptionPane.showMessageDialog(null,"Registro insertado");
@@ -203,17 +186,17 @@ public class GestionarProfesoresFrame extends JInternalFrame {
 				String Telefono = textTelefono.getText();
 				String Email =textEmail.getText();
 				String Direccion = textDireccion.getText();
-				 
+				
 				try {
 					Connection con = ConexionDB.getConnection();
-					PreparedStatement ps = con.prepareStatement("update Profesores set Nombre=?,Sexo=?,Telefono=? Email=?,Direccion=? where Codigo=? ");
+					PreparedStatement ps = con.prepareStatement("update Profesores set Nombre=?,Sexo=?,Telefono=?,Direccion=?,Email=? where Codigo=? ");
 					
 					ps.setString(1, Nombre);
 					ps.setString(2, Sexo);
 					ps.setString(3, Telefono);
 					ps.setString(4, Email);
 					ps.setString(5, Direccion);
-					ps.setInt(7, Codigo);
+					ps.setInt(6, Codigo);
 					
 					
 					ps.executeUpdate();
@@ -257,48 +240,49 @@ public class GestionarProfesoresFrame extends JInternalFrame {
 		
 	}
 	
-	private void labels() {
+	public void labels() {
 		
 		JLabel lblCodigoProfesor = new JLabel("Codigo");
-		lblCodigoProfesor.setBounds(10, 11, 106, 20);
-		lblCodigoProfesor.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		panel.add(lblCodigoProfesor);
+        lblCodigoProfesor.setBounds(210, 11, 60, 20);
+        lblCodigoProfesor.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        panel.add(lblCodigoProfesor);
 		
-		JLabel lblNombre = new JLabel("Nombre");
-		lblNombre.setBounds(126, 11, 86, 20);
-		lblNombre.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		panel.add(lblNombre);
-		
-		JLabel lblSexo = new JLabel("Sexo");
-		lblSexo.setBounds(345, 65, 47, 20);
-		lblSexo.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		panel.add(lblSexo);
-		
-		JLabel lblTelefono = new JLabel("Tel\u00E9fono");
-		lblTelefono.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lblTelefono.setBounds(10, 65, 86, 20);
-		panel.add(lblTelefono);
-		
-		JLabel lblDireccion = new JLabel("Direcci\u00F3n");
-		lblDireccion.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lblDireccion.setBounds(155, 65, 86, 20);
-		panel.add(lblDireccion);
-		
-		JLabel lblEmail = new JLabel("E-mail");
-		lblEmail.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lblEmail.setBounds(317, 11, 86, 20);
-		panel.add(lblEmail);
+        JLabel lblNombre = new JLabel("Nombre");
+        lblNombre.setBounds(71, 11, 60, 20);
+        lblNombre.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        panel.add(lblNombre);
+        
+        JLabel lblSexo = new JLabel("Sexo");
+        lblSexo.setBounds(345, 64, 39, 20);
+        lblSexo.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        panel.add(lblSexo);
+
+        JLabel lbltelefono = new JLabel("Tel\u00E9fono ");
+        lbltelefono.setBounds(209, 65, 60, 20);
+        lbltelefono.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        panel.add(lbltelefono);
+
+        JLabel lblDireccion = new JLabel("Direcci\u00F3n ");
+        lblDireccion.setBounds(331, 10, 67, 20);
+        lblDireccion.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        panel.add(lblDireccion);
+        
+        JLabel lblEmail = new JLabel("E-mail");
+        lblEmail.setBounds(78, 65, 47, 20);
+        lblEmail.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        panel.add(lblEmail);
 		
 	}
 	
-	private void textFields() {
+	public void textFields() {
 		
 		textCodigo = new JTextField();
 		textCodigo.setEditable(false);
-		textCodigo.setBounds(10, 33, 105, 20);
-		panel.add(textCodigo);
-		textCodigo.setColumns(10);
-		
+		textCodigo.setHorizontalAlignment(SwingConstants.CENTER);
+        textCodigo.setBounds(201, 33, 79, 20);
+        panel.add(textCodigo);
+        textCodigo.setColumns(10);
+        
 		textNombre = new JTextField();
 		textNombre.addKeyListener(new KeyAdapter() {
 			@Override
@@ -311,10 +295,6 @@ public class GestionarProfesoresFrame extends JInternalFrame {
 				int column;
 				String nombre = textNombre.getText().trim();
 				
-				int [] ancho= {10,50,20,100};
-				for(int i = 0; i<table.getColumnCount();i++) {
-					table.getColumnModel().getColumn(i).setPreferredWidth(ancho[i]);;
-				}
 				try {
 					Connection con = ConexionDB.getConnection();
 					ps = con.prepareStatement("Select * from Profesores where Nombre like '%"+nombre+ "%'");
@@ -334,31 +314,29 @@ public class GestionarProfesoresFrame extends JInternalFrame {
 				}
 			}
 		});
-		textNombre.addMouseListener(new MouseAdapter() {
+		
+	      textNombre.setBounds(10, 33, 182, 20);
+	      textNombre.setColumns(10);
+	      panel.add(textNombre);
+	        
+	      	textTelefono = new JTextField();
+	        textTelefono.setBounds(202, 84, 78, 20);
+	        textTelefono.setColumns(10);
+	        panel.add(textTelefono);
 
-		});
-		textNombre.setBounds(125, 33, 182, 20);
-		textNombre.setColumns(10);
-		panel.add(textNombre);
-		
-		textTelefono = new JTextField();
-		textTelefono.setBounds(10, 85, 135, 20);
-		textTelefono.setColumns(10);
-		panel.add(textTelefono);
-		
-		textDireccion = new JTextField();
-		textDireccion.setBounds(155, 85, 182, 20);
-		textDireccion.setColumns(10);
-		panel.add(textDireccion);
-		
-		textEmail = new JTextField();
-		textEmail.setBounds(317, 33, 169, 20);
-		textEmail.setColumns(10);
-		panel.add(textEmail);
+	        textDireccion = new JTextField();
+	        textDireccion.setBounds(290, 32, 149, 20);
+	        textDireccion.setColumns(10);
+	        panel.add(textDireccion);
+
+	        textEmail = new JTextField();
+	        textEmail.setBounds(10, 84, 182, 20);
+	        textEmail.setColumns(10);
+	        panel.add(textEmail);
 		
 	}
 	
-	private void habilitarbotones(){
+	public void habilitarbotones(){
 		
 		if(table.getSelectedRow() != -1) {
 			btnActualizar.setEnabled(true);
@@ -372,7 +350,7 @@ public class GestionarProfesoresFrame extends JInternalFrame {
 			
 		}
 	}
-	private void limpiar() {
+	public void limpiar() {
 		textCodigo.setText("");
 		textNombre.setText("");
 		comboSexo.getModel().setSelectedItem("");
@@ -381,19 +359,13 @@ public class GestionarProfesoresFrame extends JInternalFrame {
 		textDireccion.setText("");
 				
 }
-	private void cargartabla(){
+	public void cargartabla(){
 		DefaultTableModel modelo = (DefaultTableModel) table.getModel();
 		modelo.setRowCount(0);
 		PreparedStatement ps;
 		ResultSet rs;
 		ResultSetMetaData rmd;
 		int column;
-		/*
-		int [] ancho= {10,50,20,100};
-		for(int i = 0; i<table.getColumnCount();i++) {
-			table.getColumnModel().getColumn(i).setPreferredWidth(ancho[i]);;
-		}
-		*/
 		try {
 			Connection con = ConexionDB.getConnection();
 			ps = con.prepareStatement("Select * from Profesores");
@@ -406,25 +378,27 @@ public class GestionarProfesoresFrame extends JInternalFrame {
 					fila[indice] = rs.getObject(indice+1);
 				}
 				modelo.addRow(fila);
+
 			}
 			limpiar();
 		}catch(SQLException e2) {
 			JOptionPane.showMessageDialog(null, e2.toString());
 		}
 	}
-	private void mostrarDatos(){
+	public void mostrarDatos(){
 
 		
 		DefaultTableModel modeloTabla = new DefaultTableModel();
 		modeloTabla.addColumn("Codigo");
 		modeloTabla.addColumn("Nombre");
 		modeloTabla.addColumn("Sexo");
-		modeloTabla.addColumn("E-mail");
 		modeloTabla.addColumn("Telefono");
 		modeloTabla.addColumn("Direccion");
+		modeloTabla.addColumn("E-mail");
 		
 		
 		table.setModel(modeloTabla);
 
 	}
+
 }

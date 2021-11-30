@@ -1,13 +1,16 @@
 package index;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.SwingConstants;
 
 import conexionConBase.ConexionDB;
 import internalJframe.GestionarAsignaturasFrame;
@@ -17,10 +20,12 @@ import internalJframe.GestionarEstudiantesFrame;
 import internalJframe.GestionarProfesoresFrame;
 import internalJframe.Informacion;
 
+import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
 import java.awt.event.ActionEvent;
+import java.awt.Toolkit;
 
 
 //import conexionConBase.Conexion;
@@ -33,15 +38,13 @@ public class APP {
 	private GestionarAsignaturasFrame Asignaturas;
 	private GestionarCursosFrame Cursos;
 	private GestionarCalificacionFrame Calificacion;
-	private Informacion Info;
-	
 	private JDesktopPane desktopPane;
 	
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
+		EventQueue.invokeLater(new Runnable() {	
 			public void run() {
 				try {
 					APP window = new APP();
@@ -67,6 +70,8 @@ public class APP {
 	 */
 	private void initialize() {
 		frmSistemaDeEscuela = new JFrame();
+		frmSistemaDeEscuela.setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\Users\\user\\eclipse-workspace\\Proyecto_Final_Programacion_1\\Icono_del_programa.png"));
+		frmSistemaDeEscuela.setBackground(Color.LIGHT_GRAY);
 		frmSistemaDeEscuela.setTitle("Sistema de Escuela");
 		frmSistemaDeEscuela.setResizable(false);
 		frmSistemaDeEscuela.setBounds(100, 100, 779, 625);
@@ -74,6 +79,7 @@ public class APP {
 		frmSistemaDeEscuela.getContentPane().setLayout(null);
 		
 		JMenuBar menuBar = new JMenuBar();
+		menuBar.setBackground(new Color(224,194,248));
 		menuBar.setBounds(0, 0, 773, 28);
 		frmSistemaDeEscuela.getContentPane().add(menuBar);
 		
@@ -81,6 +87,7 @@ public class APP {
 		menuBar.add(mnEstudiantes);
 		
 		JMenuItem mntmGestionarEstudiantes = new JMenuItem("Gestionar Estudiantes");
+		mntmGestionarEstudiantes.setBackground(new Color(196, 155, 229));
 		mntmGestionarEstudiantes.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
@@ -99,6 +106,7 @@ public class APP {
 		menuBar.add(mnProfesores);
 		
 		JMenuItem mntmGestionarProfesores = new JMenuItem("Gestionar Profesores");
+        mntmGestionarProfesores.setBackground(new Color(196, 155, 229));
 		mntmGestionarProfesores.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
@@ -114,6 +122,7 @@ public class APP {
 		menuBar.add(mnAsignaturas);
 		
 		JMenuItem mntmGestionarAsignaturas = new JMenuItem("Gestionar Asignaturas");
+        mntmGestionarAsignaturas.setBackground(new Color(196, 155, 229));
 		mntmGestionarAsignaturas.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
@@ -129,6 +138,7 @@ public class APP {
 		menuBar.add(mnCursos);
 		
 		JMenuItem mntmGestionarCursos = new JMenuItem("Gestionar Cursos");
+		mntmGestionarCursos.setBackground(new Color(196, 155, 229));
 		mntmGestionarCursos.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
@@ -144,6 +154,7 @@ public class APP {
 		menuBar.add(mnCalificaciones);
 		
 		JMenuItem mntmGestionarcali = new JMenuItem("Gestionar calificacion ");
+		mntmGestionarcali.setBackground(new Color(196, 155, 229));
 		mntmGestionarcali.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
@@ -155,11 +166,7 @@ public class APP {
 		});
 		mnCalificaciones.add(mntmGestionarcali);
 		
-		JMenu mnInformacion = new JMenu("Mas...");
-		menuBar.add(mnInformacion);
-		
-		JMenuItem mntmInformacion = new JMenuItem("Informacion ");
-		mnInformacion.add(mntmInformacion);
+
 		
 	}
 	
@@ -168,7 +175,14 @@ public class APP {
 		desktopPane = new JDesktopPane();
 		desktopPane.setBounds(0, 27, 773, 569);
 		frmSistemaDeEscuela.getContentPane().add(desktopPane);
-		
+		JLabel ImagenPrincipal = new JLabel("");
+        ImagenPrincipal.setHorizontalAlignment(SwingConstants.CENTER);
+        ImagenPrincipal.setIcon(new ImageIcon("C:\\Users\\user\\eclipse-workspace\\Proyecto_Final_Programacion_1\\Icono_del_programa.png"));
+        ImagenPrincipal.setBounds(10, 0, 753, 558);
+        ImagenPrincipal.setBackground(new Color(204, 164, 237));
+        desktopPane.add(ImagenPrincipal);
+        desktopPane.setBackground(new Color(238,221,251));
+    
 	}
 	private void BaseDeDatos() {
 		

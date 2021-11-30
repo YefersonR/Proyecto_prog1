@@ -11,9 +11,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableModel;
 
 import conexionConBase.ConexionDB;
+import index.Interface;
 
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -27,8 +30,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.Color;
 
-public class GestionarCursosFrame extends JInternalFrame {
+public class GestionarCursosFrame extends JInternalFrame implements Interface{
 	
 	private JPanel panel;
 	private JTextField textCodigoCurso;
@@ -60,12 +64,15 @@ public class GestionarCursosFrame extends JInternalFrame {
 	 * Create the frame.
 	 */
 	public GestionarCursosFrame() {
-		setClosable(true);
-		setTitle("Gestionar Cursos");
-		setBounds(0, 0, 763, 559);
-		getContentPane().setLayout(null);
+		setBackground(new Color(255, 255, 255));
+        setBorder(new MatteBorder(5, 5, 5, 5, (Color) new Color(204, 164, 237)));
+        setClosable(true);
+        setTitle("Gestionar Cursos");
+        setBounds(0, 0, 763, 559);
+        getContentPane().setLayout(null);
 		
 		panel = new JPanel();
+		panel.setBackground(Color.WHITE);
 		panel.setBounds(0, 0, 747, 529);
 		getContentPane().add(panel);
 		panel.setLayout(null);
@@ -79,26 +86,25 @@ public class GestionarCursosFrame extends JInternalFrame {
 		cargartabla();
 	}
 	
-	private void labels() {
+	public void labels() {
 		
 		JLabel lblCodigoCurso = new JLabel("Codigo");
-		lblCodigoCurso.setBounds(10, 11, 106, 20);
-		lblCodigoCurso.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		panel.add(lblCodigoCurso);
-		
-		JLabel lblNombre = new JLabel("Nombre");
-		lblNombre.setBounds(126, 11, 86, 20);
-		lblNombre.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		panel.add(lblNombre);
-		
-		JLabel lblSeccion = new JLabel("Seccion");
-		lblSeccion.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		lblSeccion.setBounds(317, 11, 86, 20);
-		panel.add(lblSeccion);
-		
+        lblCodigoCurso.setBounds(217, 11, 46, 20);
+        lblCodigoCurso.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        panel.add(lblCodigoCurso);
+
+        JLabel lblNombre = new JLabel("Nombre");
+        lblNombre.setBounds(71, 11, 60, 20);
+        lblNombre.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        panel.add(lblNombre);
+
+        JLabel lblSeccion = new JLabel("Seccion");
+        lblSeccion.setFont(new Font("SansSerif", Font.PLAIN, 15));
+        lblSeccion.setBounds(340, 11, 69, 20);
+        panel.add( lblSeccion);
 	}
 	
-	private void buttons() {
+	public void buttons() {
 
 		btnInsertar = new JButton("Insertar");
 		btnInsertar.addActionListener(new ActionListener() {
@@ -189,14 +195,15 @@ public class GestionarCursosFrame extends JInternalFrame {
 		
 	}
 	
-	private void textFields() {
+	public void textFields() {
 		
 		textCodigoCurso = new JTextField();
 		textCodigoCurso.setEditable(false);
-		textCodigoCurso.setBounds(10, 33, 105, 20);
-		panel.add(textCodigoCurso);
-		textCodigoCurso.setColumns(10);
-		
+        textCodigoCurso.setHorizontalAlignment(SwingConstants.CENTER);
+        textCodigoCurso.setBounds(201, 33, 79, 20);
+        panel.add(textCodigoCurso);
+        textCodigoCurso.setColumns(10);
+        
 		textNombre = new JTextField();
 		textNombre.addKeyListener(new KeyAdapter() {
 			@Override
@@ -232,20 +239,21 @@ public class GestionarCursosFrame extends JInternalFrame {
 				}
 			}
 		});
-		textNombre.setBounds(125, 33, 182, 20);
-		textNombre.setColumns(10);
-		panel.add(textNombre);
+		 textNombre.setHorizontalAlignment(SwingConstants.CENTER);
+	        textNombre.setBounds(10, 33, 182, 20);
+	        textNombre.setColumns(10);
+	        panel.add(textNombre);
+
 		
-		textSeccion = new JTextField();
-		textSeccion.setBounds(317, 33, 169, 20);
-		textSeccion.setColumns(10);
-		panel.add(textSeccion);
-		
+	        textSeccion = new JTextField();
+	        textSeccion.setBounds(290, 33, 169, 20);
+	        textSeccion.setColumns(10);
+	        panel.add(textSeccion);
 		
 		
 	}
 	
-	private void table() {
+	public void table() {
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(10, 138, 727, 380);
@@ -281,7 +289,7 @@ public class GestionarCursosFrame extends JInternalFrame {
 		});
 		scrollPane.setViewportView(table);
 	}
-	private void habilitarbotones(){
+	public void habilitarbotones(){
 	
 		if(table.getSelectedRow() != -1) {
 			btnActualizar.setEnabled(true);
@@ -296,13 +304,13 @@ public class GestionarCursosFrame extends JInternalFrame {
 		}
 	}
 	
-	private void limpiar() {
+	public void limpiar() {
 		textCodigoCurso.setText("");
 		textNombre.setText(" ");
 		textSeccion.setText(" ");	
 	}
 	
-	private void cargartabla(){
+	public void cargartabla(){
 		DefaultTableModel modelo = (DefaultTableModel) table.getModel();
 		modelo.setRowCount(0);
 		PreparedStatement ps;
@@ -333,7 +341,7 @@ public class GestionarCursosFrame extends JInternalFrame {
 		}
 
 	}
-	private void mostrarDatos(){	
+	public void mostrarDatos(){	
 		DefaultTableModel modeloTabla = new DefaultTableModel();
 		modeloTabla.addColumn("Codigo");
 		modeloTabla.addColumn("Nombre");
