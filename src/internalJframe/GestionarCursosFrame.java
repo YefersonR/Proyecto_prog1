@@ -83,7 +83,7 @@ public class GestionarCursosFrame extends JInternalFrame implements Interface{
 		textFields();
 		table();
 		mostrarDatos();
-		cargartabla();
+		//cargartabla();
 	}
 	
 	public void labels() {

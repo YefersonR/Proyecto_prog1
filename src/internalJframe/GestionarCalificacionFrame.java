@@ -110,7 +110,7 @@ public class GestionarCalificacionFrame extends JInternalFrame implements Interf
 		textFields();
 		table();
 		mostrarDatos();
-		cargartabla();
+		//cargartabla();
 	}
 	
 	public void table() {

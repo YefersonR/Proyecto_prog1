@@ -111,7 +111,7 @@ public class GestionarAsignaturasFrame extends JInternalFrame implements Interfa
 		table();
 		buttons();
 		mostrarDatos();
-		cargartabla();
+		//cargartabla();
 	}
 	
 	public void table() {

@@ -106,7 +106,7 @@ public class GestionarEstudiantesFrame extends JInternalFrame implements Interfa
 		buttons();
 		table();
 		mostrarDatos();
-		cargartabla();
+		//cargartabla();
 
 		
 

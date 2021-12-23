@@ -92,9 +92,9 @@ public class GestionarProfesoresFrame extends JInternalFrame implements Interfac
 		labels();
 		buttons();
 		textFields();
-		//table();
+		table();
 		mostrarDatos();
-		cargartabla();
+		//cargartabla();
 	}
 	
 	public void table() {
